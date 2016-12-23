@@ -1,13 +1,15 @@
 class LittleScreen(object):
 
     def __init__(self, rows, cols):
-        self.grid = [['-'] * cols for _ in range(rows)]
+        self.grid = [[' '] * cols for _ in range(rows)]
 
-    def __str__(self):
+    def display(self):
         result = ''
         for row in self.grid:
-            result += row.__str__() + '\n'
-        return result
+            for col in row:
+                result += col
+            result += '\n'
+        print result
 
     def lit_pixels(self):
         count = 0
@@ -49,5 +51,6 @@ with open('input.txt', 'r') as f:
     for line in f:
         screen.parse_instruction(line.strip())
 
-print screen.lit_pixels()
-print screen
+print 'Lit pixels: ', screen.lit_pixels()
+print 'Display:\n'
+screen.display()
