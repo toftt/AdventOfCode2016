@@ -1,3 +1,12 @@
+def decypher(string, shifts):
+    result = ""
+    for char in string:
+        if char == "-":
+            result += " "
+        else:
+            result += chr(97 + ((ord(char) % 97) + shifts) % 26)
+    return result
+
 sector_sum = 0
 with open('input.txt', 'r') as f:
     for line in f:
@@ -17,5 +26,6 @@ with open('input.txt', 'r') as f:
         result = sorted(result, key=lambda x: (-int(x[1]), x[0]))
         if ''.join([x[0] for x in result][:5]) == checksum:
             sector_sum += int(sector_id)
-
+            real_name = decypher(line[:len(line) - 11], int(sector_id))
+            print real_name, sector_id
 print sector_sum
