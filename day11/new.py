@@ -2,7 +2,6 @@ import re
 import copy
 import itertools
 from heapq import *
-from random import randint
 
 
 def is_even(number):
