@@ -2,6 +2,7 @@ import re
 import copy
 import itertools
 from heapq import *
+from random import randint
 
 
 def is_even(number):
@@ -49,14 +50,22 @@ def finished(state):
 
 
 def evaluate_state(state):
-    result = 0
 
+    result = 0
+    empty = True
     for idx, floor in enumerate(state['floors']):
+        result += (idx ** 2) * len(floor)
+        if len(floor) != 0:
+            empty = False
+
+        if empty:
+            result += 20
+
         for n in filter(is_even, floor):
             if n + 1 in floor:
                 result += (idx ** 3)
 
-    result -= state['steps'] * 2
+    result -= state['steps'] * 4.2
     return -result
 
 
@@ -118,7 +127,7 @@ st = {'elevator': 0, 'steps': 0, 'floors': floors}
 # queue = [st]
 queue = []
 heappush(queue, (evaluate_state(st), st))
-visited = set()
+visited = {}
 max_eval = 0
 
 while queue:
@@ -126,7 +135,13 @@ while queue:
     cur = pop[1]
     ev = -pop[0]
 
-    # cur = queue[0]
+    floors = [frozenset(f) for f in cur['floors']]
+    if (cur['elevator'], tuple(floors)) not in visited or visited[(cur['elevator'], tuple(floors))] > cur['steps']:
+        for pos_state in get_possible_moves(cur):
+            heappush(queue, (evaluate_state(pos_state), pos_state))
+
+    else:
+        continue
 
     if ev > max_eval:
         print cur, len(queue), len(visited), 'eval: ', ev
@@ -136,15 +151,7 @@ while queue:
         print '\n', cur
         raw_input('Press enter to continue')
 
-    if len(visited) % 1000 == 0:
+    if len(visited):
         print cur, len(queue), len(visited), 'eval: ', ev
 
-    floors = [frozenset(f) for f in cur['floors']]
-    if (cur['elevator'], tuple(floors)) not in visited:
-        for pos_state in get_possible_moves(cur):
-            p_floors = [frozenset(f) for f in pos_state['floors']]
-            if (pos_state['elevator'], tuple(p_floors)) not in visited:
-                heappush(queue, (evaluate_state(pos_state), pos_state))
-                #queue.append(pos_state)
-
-    visited.add((cur['elevator'], tuple(floors)))
+    visited[(cur['elevator'], tuple(floors))] = cur['steps']
